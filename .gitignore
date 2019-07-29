@@ -58,4 +58,4 @@ fabric.properties
 .idea/httpRequests
 
 # database config
-src/main/resources/mybatis-conf.xml
+src/main/resources/jdbc.properties
