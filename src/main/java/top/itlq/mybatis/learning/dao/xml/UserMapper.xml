@@ -3,7 +3,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--命名空间和映射sql语句，session执行时需要命名空间 + id的完全限定名进行匹配-->
 <mapper namespace="top.itlq.mybatis.learning.dao.xml.UserMapper">
-    <select id="selectUser" parameterType="int" resultType="top.itlq.mybatis.learning.dao.User">
+    <!--此处User定义了别名-->
+    <select id="selectUser" parameterType="int" resultType="User">
       select * from user where id = #{id}
     </select>
 </mapper>
