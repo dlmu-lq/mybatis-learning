@@ -6,15 +6,20 @@
         <!--会被文件覆盖-->
         <property name="username" value="a"/>
     </properties>
+    <!--将下划线数据库字段名自动映射为驼峰格式-->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
     <!--类型别名-->
     <typeAliases>
         <typeAlias alias="User" type="top.itlq.mybatis.learning.dao.User"/>
     </typeAliases>
+    <!--核心配置，环境，用于构建configuration -> -->
     <environments default="development">
         <environment id="development">
-            <!--事务管理-->
+            <!--事务管理，用于指定 TransactionFactory -->
             <transactionManager type="JDBC"/>
-            <!--连接信息-->
+            <!--数据源连接信息-->
             <dataSource type="POOLED">
                 <property name="driver" value="${driver}"/>
                 <property name="url" value="${url}"/>
@@ -26,6 +31,6 @@
     <!--映射文件-->
     <mappers>
         <mapper resource="top/itlq/mybatis/learning/dao/xml/UserMapper.xml"/>
-        <mapper class="top.itlq.mybatis.learning.dao.in.UserMapper"/>
+        <mapper resource="top/itlq/mybatis/learning/dao/xml/UserFavoritesMapper.xml"/>
     </mappers>
 </configuration>

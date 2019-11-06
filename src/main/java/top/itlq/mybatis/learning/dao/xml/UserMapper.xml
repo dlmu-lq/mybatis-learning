@@ -3,8 +3,92 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--命名空间和映射sql语句，session执行时需要命名空间 + id的完全限定名进行匹配-->
 <mapper namespace="top.itlq.mybatis.learning.dao.xml.UserMapper">
+
+    <resultMap id="resultMap" type="top.itlq.mybatis.learning.dao.User">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="birth" property="birth"/>
+    </resultMap>
+
+    <resultMap id="userWithFavorites" type="top.itlq.mybatis.learning.dao.User"
+               extends="resultMap">
+        <!--<association property="userFavoritesEntity" column="id"-->
+                     <!--javaType="top.itlq.mybatis.learning.dao.UserFavoritesEntity"-->
+                     <!--select="top.itlq.mybatis.learning.dao.xml.UserFavoritesMapper.selectWithUserKey"/>-->
+        <collection property="userFavoritesList" column="id"
+                     ofType="top.itlq.mybatis.learning.dao.UserFavoritesEntity"
+                     select="top.itlq.mybatis.learning.dao.xml.UserFavoritesMapper.selectWithUserKey"/>
+    </resultMap>
+
+    <resultMap id="userJoinWithFavorites" type="top.itlq.mybatis.learning.dao.User" extends="resultMap">
+        <!--columnPrefix="user_favorite_" 要加，所有字段都得加，不能方便的自动驼峰映射，不如不加，重复的加一下-->
+        <!--继承映射join不能用下划线驼峰自动映射？-->
+        <collection property="userFavoritesList" ofType="top.itlq.mybatis.learning.dao.UserFavoritesEntity">
+            <id property="id" column="user_favorite_id"/>
+            <id property="userKey" column="user_key"/>
+            <id property="content" column="content"/>
+            <result property="createTime" column="create_time"/>
+            <result property="operTime" column="oper_time"/>
+            <result property="useFlg" column="use_flg"/>
+
+        </collection>
+    </resultMap>
+
+    <sql id="tableName">user</sql>
+    <sql id="columns">id,name,age,birth</sql>
+    <sql id="where">
+        <where>
+            <if test="id != null">
+                and self.id = #{id}
+            </if>
+            <if test="name != null">
+                and self.name = #{name}
+            </if>
+        </where>
+    </sql>
+
     <!--此处User定义了别名-->
-    <select id="selectUser" parameterType="int" resultType="User">
-      select * from user where id = #{id}
+    <select id="loadUser" parameterType="int" resultType="User">
+      select
+        <include refid="columns"/>
+        from
+      <include refid="tableName"/>
+       where id = #{id}
+    </select>
+
+    <!--使用Mapper映射查询，查询参数-->
+    <select id="selectUser" parameterType="Map" resultMap="resultMap">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="tableName"/>
+        <include refid="where"/>
+    </select>
+
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="tableName"/>
+        (name,age,birth)
+        values
+        (#{name},#{age},#{birth})
+    </insert>
+
+    <select id="selectWithFavorites" resultMap="userWithFavorites" parameterType="Map">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="tableName"/>
+        <include refid="where"/>
+    </select>
+
+    <!--todo 按说查出多条数据，为什么能够以映射为复合主子表类型-->
+    <select id="selectWithJoinFavorites" resultMap="userJoinWithFavorites" parameterType="Map">
+        select
+        self.id , name, age, birth, f.id as user_favorite_id,user_key,content,create_time,oper_time,use_flg
+        from
+        <include refid="tableName"/> self
+        left join user_favorites f on self.id = f.user_key
+        <include refid="where"/>
     </select>
 </mapper>
