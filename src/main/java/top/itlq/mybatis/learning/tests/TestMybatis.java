@@ -26,6 +26,9 @@ public class TestMybatis {
         try {
             User user = sqlSession.selectOne("top.itlq.mybatis.learning.dao.xml.UserMapper.loadUser",1);
             System.out.println(user);
+            // 映射
+            top.itlq.mybatis.learning.dao.xml.UserMapper userMapper = sqlSession.getMapper(top.itlq.mybatis.learning.dao.xml.UserMapper.class);
+            System.out.println(userMapper.loadUser(1));
         }finally {
             sqlSession.close();
         }
